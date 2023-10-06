@@ -13,9 +13,10 @@ function Header() {
             MealBox
           </Navbar.Brand>
             <Nav className="me-auto" >
-                <Nav.Link href="/">Home</Nav.Link>
-                <Nav.Link href="/meal">Meals</Nav.Link>
-                <Nav.Link href="/recipe">Recipes</Nav.Link>
+                <Nav.Link href="/homepage">Home</Nav.Link>
+                <Nav.Link href="/signin">SignIn</Nav.Link>
+                <Nav.Link href="/Contact">Contact Us</Nav.Link>
+                {/* <Nav.Link href="/ingredient">Ingredients</Nav.Link> */}
           </Nav>
         </Container>
       </Navbar>

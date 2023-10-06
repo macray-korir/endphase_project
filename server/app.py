@@ -1,17 +1,19 @@
-from flask import Flask, make_response, jsonify,request
+from flask import Flask, make_response, jsonify, request, render_template, session
 from models import db, User,Meal,Ingredient
 from flask_restful import Resource, Api
 from flask_migrate import Migrate
-
-app = Flask(__name__)
+from flask_bcrypt import Bcrypt
+# 
+app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist', static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///endphase.db'
 db.init_app(app)
 api = Api(app)
 migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
 
 @app.route('/')
 def home():
-    return {"hello": "Welcome to my API"}
+    return render_template('index.html')
 
 class UsersResource(Resource):
     def get(self):
@@ -70,45 +72,47 @@ api.add_resource(UserResource, '/users/<int:id>')
 
 class MealResource(Resource):
     def get(self, id=None):
-     if id is None:
-        meal_list = []
-        for meal in Meal.query.all():
-            meal_dict = {
-                "id": meal.id,
-                "title": meal.title,
-                "description": meal.description,
-                "category": meal.category
-            }
-            meal_list.append(meal_dict)
+        if id is None:
+            meal_list = []
+            for meal in Meal.query.all():
+                meal_dict = {
+                    "id": meal.id,
+                    "title": meal.title,
+                    "description": meal.description,
+                    "category": meal.category
+                }
+                meal_list.append(meal_dict)
 
-        response = make_response(
-            jsonify(meal_list),
-            200
-        )
-        return response
-     else:
-        meal = Meal.query.filter_by(id=id).first()
-        if meal:
-            meal_data = {
-                "id": meal.id,
-                "title": meal.title,
-                "description": meal.description,
-                "category": meal.category
-            }
-            return meal_data, 200
+            response = make_response(
+                jsonify(meal_list),
+                200
+            )
+            return response
         else:
-            return {"error": "Meal not found"}, 404
+            meal = Meal.query.filter_by(id=id).first()
+            if meal:
+                meal_data = {
+                    "id": meal.id,
+                    "title": meal.title,
+                    "description": meal.description,
+                    "category": meal.category,
+                    "image_url": meal.image_url  
+                }
+                return meal_data, 200
+            else:
+                return {"error": "Meal not found"}, 404
 
     def post(self):
         meal_data = request.get_json()
         title = meal_data.get('title')
         description = meal_data.get('description')
         category = meal_data.get('category')
+        image_url = meal_data.get('image_url') 
 
         if not title or not description or not category:
             return {"error": "Missing required fields"}, 400
 
-        new_meal = Meal(title=title, description=description, category=category)
+        new_meal = Meal(title=title, description=description, category=category, image=image_url)  # Assign image_url to the image field
         db.session.add(new_meal)
         db.session.commit()
 
@@ -118,7 +122,8 @@ class MealResource(Resource):
         }
 
         return response_data, 201
-    
+
+
     def patch(self, id):
         meal = Meal.query.filter_by(id=id).first()
         if not meal:
@@ -137,7 +142,7 @@ class MealResource(Resource):
         return {"message": "Recipe updated successfully"}, 200
 
     def delete(self, id):
-        meal= Meal.query.filter_by(id=id).first()
+        meal = Meal.query.filter_by(id=id).first()
         if not meal:
             return {"error": "meal not found"}, 404
 
@@ -146,6 +151,7 @@ class MealResource(Resource):
         return {"message": "Meal deleted successfully"}, 200
 
 api.add_resource(MealResource, '/meal', '/meal/<int:id>')
+
 
 class IngredientResource(Resource):
     def get(self, id=None):
@@ -223,7 +229,37 @@ class IngredientResource(Resource):
 
 api.add_resource(IngredientResource, '/ingredient', '/ingredient/<int:id>')
 
+@app.route('/signup', methods=['POST'])
+def sign_up():
+    if request.method == 'POST':
+        userData = request.get_json()
+        username = userData['username']
+        email = userData['email']
+        password = userData['password']
 
+        new_user = User(username=username, email=email, password_hash=password)
 
+        db.session.add(new_user)
+        db.session.commit()
+        session['random_user'] = new_user.id
+
+        return jsonify({"message": "New User created successfully"}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        login_data = request.get_json()
+        username = login_data.get('username')
+        password = login_data.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.validatepassword(password):
+            session['user_id'] = user.id
+            return jsonify({"message": "Login successful"}), 200
+        else:
+            return jsonify({"message": "Invalid username or password"}), 401
+
+ 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -9,7 +9,7 @@ function Contact() {
       style={{
         width: '100%',
         height: '100vh',
-        backgroundImage: 'url("./public/image2.jpg")',
+        backgroundImage: 'url("/image2.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         objectFit: 'cover',
@@ -25,9 +25,9 @@ function Contact() {
         <h3>You can also reach us on 0711011011 from Monday to Friday</h3>
 
 
-        <Link to="/feedback">
+        {/* <Link to="/feedback">
           <button className="btn-custom">Give Feedback</button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

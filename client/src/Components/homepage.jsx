@@ -9,7 +9,7 @@ function HomePage() {
         style={{
           width: '100%',
           height: '100vh',
-          backgroundImage: 'url("./public/image3.jpg")',
+          backgroundImage: 'url("/image3.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           objectFit: 'cover',
@@ -25,11 +25,14 @@ function HomePage() {
             <Link to="/meal" className="btn-custom">
               Meals
             </Link>
-            <Link to="/contact" className="btn-custom">
+            <Link to="/ingredient" className="btn-custom">
               Ingredients
             </Link>
             <Link to="/contact" className="btn-custom">
               Contact Us
+            </Link>
+            <Link to="/addmeal" className="btn-custom">
+              Add Meal
             </Link>
           </div>
         </div>

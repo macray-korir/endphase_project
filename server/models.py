@@ -13,7 +13,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    recipes = db.relationship('Meal', backref='user', lazy=True)
+    meals = db.relationship('Meal', backref='user', lazy=True)
 
 
 class Meal(db.Model, SerializerMixin):
@@ -25,6 +25,7 @@ class Meal(db.Model, SerializerMixin):
     category = db.Column(db.String(50), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    image = db.Column(db.String(255), nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
