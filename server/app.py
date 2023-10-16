@@ -1,3 +1,4 @@
+import os
 from flask import Flask, make_response, jsonify, request, render_template, session
 from models import db, User,Meal,Ingredient
 from flask_restful import Resource, Api
@@ -5,7 +6,7 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 # 
 app = Flask(__name__, static_folder='../client/dist', template_folder='../client/dist', static_url_path='')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///endphase.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 db.init_app(app)
 api = Api(app)
 migrate = Migrate(app, db)

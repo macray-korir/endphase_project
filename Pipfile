@@ -11,6 +11,8 @@ sqlalchemy-serializer = "*"
 flask-restful = "*"
 faker = "*"
 flask-bcrypt = "*"
+gunicorn = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
